@@ -1,28 +1,37 @@
 <html>
     <?php 
-
-    if(isset($_POST['userName']) && isset($_POST['pass'])){  
-        $directoryName = $_POST['userName'] . '_user';
-        $ourFile = $directoryName."/".$_POST['userName'] ."_pass.txt";
-
-        if (!file_exists($directoryName)) {
-            mkdir($directoryName, 0777, true);
+    include 'utils.php';  
+    
+    $error = '';
+    
+    if(isset($_POST['userName']) && isset($_POST['pass'])){      
+        $username = $_POST['userName'];
+        $pass = $_POST['pass'];
+        
+        if(empty($username) || empty($pass)){
+            $error = "Username or password not provide";
+        } else {
+            $error = setUserDirectory($username, $pass);            
         }
-        $ourFileHandle = fopen($ourFile, 'w') or die("can't open file");
-        fclose($ourFileHandle);
-
-        $fopen = fopen($ourFile, 'a');
-        fwrite($fopen, $_POST['pass']);
-
-        fclose($fopen);
     }     
 ?>
-    <head><title>Simple Sign Up</title></head>
+    <head>
+        <title>Sign Up</title>
+        <link rel="stylesheet" href="css/main.css" type="text/css">
+    </head>
     <body>
+        <?php
+            includeFile('header.php', ["title" => 'Sign Up', "login" => true])
+        ?>
         <form method="post">
         Username: <input type="text" name="userName"><br>
         Password: <input type="password" name="pass"><br>
-        <input type="submit" value="Submit Account">
+        <input type="submit" value="Sign up">
         </form>
+        <?php
+            if(!empty($error)) {
+                echo '<p>Error: '. $error .'</p>';
+            }
+        ?>
     </body>
 </html> 

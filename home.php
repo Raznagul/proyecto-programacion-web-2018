@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Tarea 3</title>
+        <title>Home</title>
+        <link rel="stylesheet" href="css/main.css" type="text/css">
     </head>
     <body>
-        <h1><a href="index.php">Home</a></h2>
-        <h1>Tarea 3</h1>
-
-        <?php
-
+        <?php 
+            include 'utils.php';
+            includeFile('header.php', ["title" => 'Home', "logout"=> true]);
             session_start();
+            checkCredentials();
+            
             if (!isset($_SESSION['i'])) { 
                 $_SESSION['i'] = null;
             }
@@ -112,7 +113,7 @@
 
         <table>
             <tr>
-                <th>All contacts</th>
+                <th>Files</th>
             </tr>
             <tr>
                 <td><a href="tarea3.php">New</a></td>
@@ -160,19 +161,19 @@
                             <td><input name="name" type="text" value= "<?php echo $content[0]?>"></td>
                         </tr>
                         <tr>
-                            <td>work</td>
+                            <td>author</td>
                             <td><input name="work" type="text" value= "<?php echo $content[1]?>"></td>
                         </tr>
                         <tr>
-                            <td>mobile</td>
+                            <td>description</td>
                             <td><input name="mobile" type="tel" value= "<?php echo $content[2]?>"></td>
                         </tr>
                         <tr>
-                            <td>email</td>
+                            <td>clasification</td>
                             <td><input name="email" type="text" value= "<?php echo $content[3]?>"></td>
                         </tr>
                         <tr>
-                            <td>address</td>
+                            <td>size</td>
                             <td><input name="address" type="text" value= "<?php echo $content[4]?>"></td>
                         </tr>
                     </table>
@@ -190,19 +191,19 @@
                             <td><input name="name" type="text" value= ""></td>
                         </tr>
                         <tr>
-                            <td>work</td>
+                            <td>author</td>
                             <td><input name="work" type="text" value= ""></td>
                         </tr>
                         <tr>
-                            <td>mobile</td>
+                            <td>description</td>
                             <td><input name="mobile" type="tel" value= ""></td>
                         </tr>
                         <tr>
-                            <td>email</td>
+                            <td>clasification</td>
                             <td><input name="email" type="text" value= ""></td>
                         </tr>
                         <tr>
-                            <td>address</td>
+                            <td>size</td>
                             <td><input name="address" type="text" value= ""></td>
                         </tr>
                     </table>
