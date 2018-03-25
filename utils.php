@@ -18,6 +18,10 @@
         }
     }
     
+    function getUserName() {
+        return $_SESSION['user'];
+    }
+    
     function logIn($username) {
         $_SESSION['user'] = $username; 
         $_SESSION['logged'] = "yes"; 
@@ -37,19 +41,40 @@
     }
     
     function passFile($username) {
-        return $username . '_pass.txt';
+        $directoryName = directoryName($username);
+        return $directoryName ."/". $username . '_pass.txt';
     }
+    
+    function indexFile($username) {
+        $directoryName = directoryName($username);
+        return $directoryName ."/index.txt";
+    }
+    
+    function contentFile($username) {
+        $directoryName = directoryName($username);
+        return $directoryName ."/content.txt";
+    }
+    
     
     function setUserDirectory($username, $pass) {
         $directoryName = directoryName($username);
-        $ourFile = $directoryName ."/". passFile($username);
+        $passFile = passFile($username);
+        $indexFile = indexFile($username);
+        $contentFile = contentFile($username);
 
         if (!file_exists($directoryName)) {
             mkdir($directoryName, 0777, true);
-            $ourFileHandle = fopen($ourFile, 'w') or die("can't open file");
-            fclose($ourFileHandle);
 
-            $fopen = fopen($ourFile, 'a');
+            $passFileHandle = fopen($passFile, 'w') or die("can't open file");
+            fclose($passFileHandle);
+            
+            $indexFileHandle = fopen($indexFile, 'w') or die("can't open file");
+            fclose($indexFileHandle);
+            
+            $contentFileHandle = fopen($contentFile, 'w') or die("can't open file");
+            fclose($contentFileHandle);
+
+            $fopen = fopen($passFile, 'a');
             fwrite($fopen, $pass);
 
             fclose($fopen);
