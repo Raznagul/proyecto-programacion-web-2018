@@ -5,108 +5,72 @@
         <link rel="stylesheet" href="css/main.css" type="text/css">
     </head>
     <body>
-        <?php 
+        <?php
             include 'utils.php';
             includeFile('header.php', ["title" => 'Home', "logout"=> true]);
             session_start();
             checkCredentials();
             
-            if (!isset($_SESSION['i'])) { 
-                $_SESSION['i'] = null;
-            }
+            $indexFileName = "tarea3index.txt";
+            $contentFileName = "tarea3content.txt";
+            $arrayIndex = file($indexFileName);
 
-            echo "get";
-            echo "</br>";
-            print_r($_GET);  // for all GET variables
-            echo "</br>";
-            echo "post";
-            echo "</br>";
-            print_r($_POST); // for all POST variables
-            echo "</br>";   
-
+            function functionName() {
+                ;
+            } 
+            
             if (isset($_POST['create'])) {
 
-                $contentFile = fopen("tarea3content.txt","a+");
+                $contentFile = fopen($contentFileName,"a+");
                 $newContent = $_POST['name'].";".$_POST['work'].";".$_POST['mobile'].";".$_POST['email'].";".$_POST['address'].";".PHP_EOL;
                 $contentByteWriten = fwrite($contentFile, $newContent);
                 fclose($contentFile);
 
-                $arrayIndex = file("tarea3index.txt");
                 if(!empty($arrayIndex)){
-                    $arrayIndex = end($arrayIndex);
-                    $arrayIndex = explode(";", $arrayIndex);
-                    $previosIndex = intval($arrayIndex[1]);
+                    $lastIndex = end($arrayIndex);
+                    $arrayLastIndex = explode(";", $lastIndex);
+                    $lastPosition = intval($arrayLastIndex[1]);
                 } else {
-                    $previosIndex = 0;
+                    $lastPosition = 0;
                 }
 
-                $indexFile = fopen("tarea3index.txt","a+");
-                $newIndex = $_POST['name'].";" .($contentByteWriten+$previosIndex).";".$contentByteWriten.";".TRUE.";".PHP_EOL;
-                $byteWriten = fwrite($indexFile, $newIndex);
-                fclose($indexFile);
-
+                $arrayIndex[] = $_POST['name'].";" .($contentByteWriten+$lastPosition).";".$contentByteWriten.";".TRUE.";".PHP_EOL;
+                file_put_contents($indexFileName, $arrayIndex);
 
             }
 
             if (isset($_POST['delete'])){
-                $indexFile = file("tarea3index.txt");
                 
-                $posArray = explode(";", $indexFile[$_SESSION["p"]]);
-                $posArray[3] = 0;
+                $posArrayIndex = explode(";", $arrayIndex[$_SESSION["p"]]);
+                $posArrayIndex[3] = 0;
                 
-                $indexFile[$_SESSION["p"]] = implode(";", $posArray);
-                
-                file_put_contents("tarea3index.txt", $indexFile);
-            }
-
-            if (isset($_POST['delete'])){
-                $indexFile = file("tarea3index.txt");
-                
-                $posArray = explode(";", $indexFile[$_SESSION["p"]]);
-                $posArray[3] = 0;
-                
-                $indexFile[$_SESSION["p"]] = implode(";", $posArray);
-                
-                file_put_contents("tarea3index.txt", $indexFile);
+                $arrayIndex[$_SESSION["p"]] = implode(";", $posArrayIndex);
+                file_put_contents($indexFileName, $arrayIndex);
             }
 
             if (isset($_POST['update'])) {
 
-                $contentFile = fopen("tarea3content.txt","a+");
+                $contentFile = fopen($contentFileName,"a+");
                 $newContent = $_POST['name'].";".$_POST['work'].";".$_POST['mobile'].";".$_POST['email'].";".$_POST['address'].";".PHP_EOL;
                 $contentByteWriten = fwrite($contentFile, $newContent);
                 fclose($contentFile);
 
-                $arrayIndex = file("tarea3index.txt");
                 if(!empty($arrayIndex)){
-                    $arrayIndex = end($arrayIndex);
-                    $arrayIndex = explode(";", $arrayIndex);
-                    $previosIndex = intval($arrayIndex[1]);
+                    $lastIndex = end($arrayIndex);
+                    $arrayLastIndex = explode(";", $lastIndex);
+                    $lastPosition = intval($arrayLastIndex[1]);
                 } else {
-                    $previosIndex = 0;
+                    $lastPosition = 0;
                 }
 
-                $indexFile = fopen("tarea3index.txt","a+");
-                $newIndex = $_POST['name'].";" .($contentByteWriten+$previosIndex).";".$contentByteWriten.";".TRUE.";".PHP_EOL;
-                $byteWriten = fwrite($indexFile, $newIndex);
-                fclose($indexFile);
+                $arrayIndex[] = $_POST['name'].";" .($contentByteWriten+$lastPosition).";".$contentByteWriten.";".TRUE.";".PHP_EOL;
 
-                $indexFile = file("tarea3index.txt");
+                $posArrayIndex = explode(";", $arrayIndex[$_SESSION["p"]]);
+                $posArrayIndex[3] = 0;
                 
-                $posArray = explode(";", $indexFile[$_SESSION["p"]]);
-                $posArray[3] = 0;
-                
-                $indexFile[$_SESSION["p"]] = implode(";", $posArray);
-                
-                file_put_contents("tarea3index.txt", $indexFile);
+                $arrayIndex[$_SESSION["p"]] = implode(";", $posArrayIndex);
+                file_put_contents($indexFileName, $arrayIndex);
 
-            }
-
-            $indexArray = file("tarea3index.txt");
-            if ($indexArray){
-                
-            } else {
-                echo "Could not open file";
             }
 
         ?>
@@ -117,8 +81,9 @@
             </tr>
             <tr>
                 <td><a href="tarea3.php">New</a></td>
+            <tr>
             <?php 
-                foreach ($indexArray as $key => $value) {
+                foreach ($arrayIndex as $key => $value) {
 
                     $value = explode(";", $value);
                     if ($value[3]) {
@@ -137,10 +102,9 @@
             
             <?php 
 
+                if (isset($_GET['contact'], $_GET['i'], $_GET['w'], $_GET['p'])) { 
 
-                if (isset($_GET['contact'], $_GET['i'])) { 
-
-                    $contentFile = fopen("tarea3content.txt","c+");
+                    $contentFile = fopen($contentFileName,"c+");
 
                     fseek($contentFile, ($_GET['i']-$_GET['w']), SEEK_CUR);
                     $content = fgets($contentFile);
@@ -150,9 +114,6 @@
                     $_SESSION['i'] = $_GET['i'];
                     $_SESSION['w'] = $_GET['w'];
                     $_SESSION['p'] = $_GET['p'];
-                    var_dump($_GET['i']);
-                    var_dump($_GET['w']);
-                    var_dump($_GET['p']);
                     
             ?>
                     <table>
