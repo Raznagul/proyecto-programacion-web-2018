@@ -86,7 +86,7 @@
     
     function checkLogIn($username, $pass) {
         $directoryName = directoryName($username);
-        $myfile = $directoryName ."/". passFile($username);
+        $myfile = passFile($username);
         $exists = file_exists($myfile); 
 
         if($exists){ 
@@ -104,7 +104,7 @@
     } 
     
     function find_string_in_array ($arr, $string) {
-        return array_filter($arr, function($value) use ($string) {
+        return array_filter($arr,  function($value) use ($string) {
             return strpos($value, $string) !== false;
         });
     }

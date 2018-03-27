@@ -10,7 +10,7 @@
         if(empty($username) || empty($pass)){
             $error = "Username or password not provide";
         } else {
-            checkLogIn($username,$pass);
+            $error = checkLogIn($username,$pass);
         }
     }
 ?>

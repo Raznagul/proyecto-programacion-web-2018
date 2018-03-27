@@ -10,13 +10,10 @@
             
             echo directoryName(getUserName());
 
-            $indexFileName = indexFile(getUserName());
-            $contentFileName = contentFile(getUserName());
+            $username = getUserName();
+            $indexFileName = indexFile($username);
+            $contentFileName = contentFile($username);
             $arrayIndex = file($indexFileName);
-
-            function functionName() {
-                ;
-            } 
             
             if (isset($_POST['create'])) {
 
@@ -101,8 +98,14 @@
                 $arrayIndex[$_SESSION["p"]] = implode(";", $posArrayIndex);
                 file_put_contents($indexFileName, $arrayIndex);
 
-            }
+            }          
 
+            if (isset($_POST['filter'])) {
+               $filterText = $_POST['filterText'];
+               if(!empty($filterText)) {
+                   $arrayIndex = find_string_in_array($arrayIndex, $filterText);
+               }
+           }
         ?>
 
         <table>
@@ -110,7 +113,25 @@
                 <th>Files</th>
             </tr>
             <tr>
+<<<<<<< HEAD
                 <td><a href="home.php">New</a></td>
+=======
+                
+                <form method="post">                
+                    <td>Filter files:</td>
+                    <?php 
+                    if (isset($_POST['filter'])) {
+                        echo '<td><input name="filterText" type="text" value= "'. $_POST['filterText'] .'"></td>';
+                    } else {
+                        echo '<td><input name="filterText" type="text" value= ""></td>';
+                    }                    
+                    ?>
+                    <td><input name="filter" type="submit" value="Buscar"></td>
+                </form>
+            </tr>
+            <tr>
+                <!-- <td><a href="tarea3.php">New</a></td> -->
+>>>>>>> e8bb07a0b9bc8c990e35bbf23f24189248fe36c8
             <tr>
             <?php 
                 foreach ($arrayIndex as $key => $value) {
@@ -128,7 +149,11 @@
 
         <hr style="border:none; height:1px;background-color:#000080">
 
+<<<<<<< HEAD
         <form action="home.php" method="post" enctype="multipart/form-data">
+=======
+        <form method="post">
+>>>>>>> e8bb07a0b9bc8c990e35bbf23f24189248fe36c8
             
             <?php 
 
