@@ -7,12 +7,25 @@
             includeFile('header.php', ["title" => 'Home', "logout"=> true]);
             session_start();
             checkCredentials();
-            
-            echo directoryName(getUserName());
+
+            echo "<pre>";
+            print_r($_GET);
+            echo "</pre>";
+            echo "<pre>";
+            print_r($_POST);
+            echo "</pre>";
+            echo "<pre>";
+            print_r($_FILES);
+            echo "</pre>";
+
+            echo "<pre>";
+            print_r(time());
+            echo "</pre>";
 
             $username = getUserName();
             $indexFileName = indexFile($username);
             $contentFileName = contentFile($username);
+            $directoryName = directoryName($username);
             $arrayIndex = file($indexFileName);
             
             if (isset($_POST['create'])) {
@@ -20,6 +33,8 @@
                 //tipos de formatos de archivo que acepta 
                 $allowedExts = array("txt", "pptx");
                 $extension = pathinfo($_FILES['file']['name'], PATHINFO_EXTENSION);
+                $filename = pathinfo($_FILES['file']['name'], PATHINFO_FILENAME);
+                
                 //pregunta que tipo de archivos puedo subir y por el tamaño en bytes
                 if (($_FILES["file"]["size"] < 2000000) && in_array($extension, $allowedExts)) {
                     //Si ocurrio un error en la subida
@@ -33,15 +48,15 @@
                         echo "Temp file: " . $_FILES["file"]["tmp_name"] . "<br />";
 
                         //Para cargar en otro lugar
-                        $carga = realpath(directoryName(getUserName())."/");
-                        echo $carga;
+                        $carga = realpath($directoryName."//");
 
-                        if (file_exists($carga . $_FILES["file"]["name"])) {
+                        if (file_exists($directoryName . $_FILES["file"]["name"])) {
                             echo $_FILES["file"]["name"] . " already exists. ";
                         } else {
-                            move_uploaded_file($_FILES["file"]["tmp_name"], $carga . $_FILES["file"]["name"]);
+                            $storedFilename = $filename.time().".".$extension;
+                            move_uploaded_file($_FILES["file"]["tmp_name"], $directoryName . $storedFilename);
 
-                            echo "Stored in: " . realpath($_SERVER["DOCUMENT_ROOT"]) . "\\" . "upload/" . $_FILES["file"]["name"];
+                            echo "Stored in: " . realpath($_SERVER["DOCUMENT_ROOT"]) . "\\" . $directoryName . $storedFilename;
                         }
                     }
                 } else {
@@ -49,7 +64,7 @@
                 }
 
                 $contentFile = fopen($contentFileName,"a+");
-                $newContent = $_POST['name'].";".$_POST['work'].";".$_POST['mobile'].";".$_POST['email'].";".$_POST['address'].";".PHP_EOL;
+                $newContent = $_POST['name'].";".$_POST['work'].";".$_POST['mobile'].";".$_POST['email'].";".$_POST['address'].";".$storedFilename.";".$filename.";".PHP_EOL;
                 $contentByteWriten = fwrite($contentFile, $newContent);
                 fclose($contentFile);
 
@@ -186,7 +201,7 @@
                         </tr>
                         <tr>
                             <td>file</td>
-                            <td><input type="file" name="file" id="file"></td>
+                            <td><a href="<?php echo $directoryName.$content[5]?>" download="<?php echo $content[6]?>"><?php echo $content[6]?></a> </td>
                         </tr>
                     </table>
                     <button type="submit" name="delete">Delete</button>
