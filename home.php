@@ -8,20 +8,6 @@
             session_start();
             checkCredentials();
 
-            echo "<pre>";
-            print_r($_GET);
-            echo "</pre>";
-            echo "<pre>";
-            print_r($_POST);
-            echo "</pre>";
-            echo "<pre>";
-            print_r($_FILES);
-            echo "</pre>";
-
-            echo "<pre>";
-            print_r(time());
-            echo "</pre>";
-
             $username = getUserName();
             $indexFileName = indexFile($username);
             $contentFileName = contentFile($username);
