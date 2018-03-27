@@ -113,9 +113,6 @@
                 <th>Files</th>
             </tr>
             <tr>
-<<<<<<< HEAD
-                <td><a href="home.php">New</a></td>
-=======
                 
                 <form method="post">                
                     <td>Filter files:</td>
@@ -130,9 +127,8 @@
                 </form>
             </tr>
             <tr>
-                <!-- <td><a href="tarea3.php">New</a></td> -->
->>>>>>> e8bb07a0b9bc8c990e35bbf23f24189248fe36c8
-            <tr>
+                <td><a href="home.php">New</a></td>
+            </tr>
             <?php 
                 foreach ($arrayIndex as $key => $value) {
 
@@ -149,11 +145,7 @@
 
         <hr style="border:none; height:1px;background-color:#000080">
 
-<<<<<<< HEAD
         <form action="home.php" method="post" enctype="multipart/form-data">
-=======
-        <form method="post">
->>>>>>> e8bb07a0b9bc8c990e35bbf23f24189248fe36c8
             
             <?php 
 
