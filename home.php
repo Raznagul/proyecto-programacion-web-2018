@@ -1,9 +1,6 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Home</title>
-        <link rel="stylesheet" href="css/main.css" type="text/css">
-    </head>
+    <?php include_once "head.php"; ?>
     <body>
         <?php
             include 'utils.php';
@@ -11,8 +8,10 @@
             session_start();
             checkCredentials();
             
-            $indexFileName = "tarea3index.txt";
-            $contentFileName = "tarea3content.txt";
+            echo directoryName(getUserName());
+
+            $indexFileName = indexFile(getUserName());
+            $contentFileName = contentFile(getUserName());
             $arrayIndex = file($indexFileName);
 
             function functionName() {
@@ -20,6 +19,37 @@
             } 
             
             if (isset($_POST['create'])) {
+
+                //tipos de formatos de archivo que acepta 
+                $allowedExts = array("txt", "pptx");
+                $extension = pathinfo($_FILES['file']['name'], PATHINFO_EXTENSION);
+                //pregunta que tipo de archivos puedo subir y por el tamaño en bytes
+                if (($_FILES["file"]["size"] < 2000000) && in_array($extension, $allowedExts)) {
+                    //Si ocurrio un error en la subida
+                    if ($_FILES["file"]["error"] > 0) {
+                        echo "Return Code: " . $_FILES["file"]["error"] . "<br />";
+                    } else {
+                        //informacion del archivo
+                        echo "Upload: " . $_FILES["file"]["name"] . "<br />";
+                        echo "Type: " . $_FILES["file"]["type"] . "<br />";
+                        echo "Size: " . ($_FILES["file"]["size"] / 1024) . " Kb<br />";
+                        echo "Temp file: " . $_FILES["file"]["tmp_name"] . "<br />";
+
+                        //Para cargar en otro lugar
+                        $carga = realpath(directoryName(getUserName())."/");
+                        echo $carga;
+
+                        if (file_exists($carga . $_FILES["file"]["name"])) {
+                            echo $_FILES["file"]["name"] . " already exists. ";
+                        } else {
+                            move_uploaded_file($_FILES["file"]["tmp_name"], $carga . $_FILES["file"]["name"]);
+
+                            echo "Stored in: " . realpath($_SERVER["DOCUMENT_ROOT"]) . "\\" . "upload/" . $_FILES["file"]["name"];
+                        }
+                    }
+                } else {
+                    echo "Invalid file";
+                }
 
                 $contentFile = fopen($contentFileName,"a+");
                 $newContent = $_POST['name'].";".$_POST['work'].";".$_POST['mobile'].";".$_POST['email'].";".$_POST['address'].";".PHP_EOL;
@@ -80,7 +110,7 @@
                 <th>Files</th>
             </tr>
             <tr>
-                <td><a href="tarea3.php">New</a></td>
+                <td><a href="home.php">New</a></td>
             <tr>
             <?php 
                 foreach ($arrayIndex as $key => $value) {
@@ -98,7 +128,7 @@
 
         <hr style="border:none; height:1px;background-color:#000080">
 
-        <form action="tarea3.php" method="post">
+        <form action="home.php" method="post" enctype="multipart/form-data">
             
             <?php 
 
@@ -137,6 +167,10 @@
                             <td>size</td>
                             <td><input name="address" type="text" value= "<?php echo $content[4]?>"></td>
                         </tr>
+                        <tr>
+                            <td>file</td>
+                            <td><input type="file" name="file" id="file"></td>
+                        </tr>
                     </table>
                     <button type="submit" name="delete">Delete</button>
                     <button type='submit' name='update'>Update</button>
@@ -166,6 +200,10 @@
                         <tr>
                             <td>size</td>
                             <td><input name="address" type="text" value= ""></td>
+                        </tr>
+                        <tr>
+                            <td>file</td>
+                            <td><input type="file" name="file" id="file"></td>
                         </tr>
                     </table>
                     <button type="submit" name="create">Create</button>

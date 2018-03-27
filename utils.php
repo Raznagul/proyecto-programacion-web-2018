@@ -37,22 +37,22 @@
     }
      
     function directoryName($username) {
-        return $username . '_user';
+        return $username . '_user/';
     }
     
     function passFile($username) {
         $directoryName = directoryName($username);
-        return $directoryName ."/". $username . '_pass.txt';
+        return $directoryName . $username . '_pass.txt';
     }
     
     function indexFile($username) {
         $directoryName = directoryName($username);
-        return $directoryName ."/index.txt";
+        return $directoryName ."index.txt";
     }
     
     function contentFile($username) {
         $directoryName = directoryName($username);
-        return $directoryName ."/content.txt";
+        return $directoryName ."content.txt";
     }
     
     
