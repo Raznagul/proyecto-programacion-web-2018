@@ -11,13 +11,10 @@
             session_start();
             checkCredentials();
             
-            $indexFileName = "tarea3index.txt";
-            $contentFileName = "tarea3content.txt";
+            $username = getUserName();
+            $indexFileName = indexFile($username);
+            $contentFileName = contentFile($username);
             $arrayIndex = file($indexFileName);
-
-            function functionName() {
-                ;
-            } 
             
             if (isset($_POST['create'])) {
 
@@ -71,8 +68,14 @@
                 $arrayIndex[$_SESSION["p"]] = implode(";", $posArrayIndex);
                 file_put_contents($indexFileName, $arrayIndex);
 
-            }
+            }          
 
+            if (isset($_POST['filter'])) {
+               $filterText = $_POST['filterText'];
+               if(!empty($filterText)) {
+                   $arrayIndex = find_string_in_array($arrayIndex, $filterText);
+               }
+           }
         ?>
 
         <table>
@@ -80,7 +83,21 @@
                 <th>Files</th>
             </tr>
             <tr>
-                <td><a href="tarea3.php">New</a></td>
+                
+                <form method="post">                
+                    <td>Filter files:</td>
+                    <?php 
+                    if (isset($_POST['filter'])) {
+                        echo '<td><input name="filterText" type="text" value= "'. $_POST['filterText'] .'"></td>';
+                    } else {
+                        echo '<td><input name="filterText" type="text" value= ""></td>';
+                    }                    
+                    ?>
+                    <td><input name="filter" type="submit" value="Buscar"></td>
+                </form>
+            </tr>
+            <tr>
+                <!-- <td><a href="tarea3.php">New</a></td> -->
             <tr>
             <?php 
                 foreach ($arrayIndex as $key => $value) {
@@ -98,7 +115,7 @@
 
         <hr style="border:none; height:1px;background-color:#000080">
 
-        <form action="tarea3.php" method="post">
+        <form method="post">
             
             <?php 
 
