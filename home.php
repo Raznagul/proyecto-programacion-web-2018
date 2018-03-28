@@ -95,8 +95,8 @@
                 //tipos de formatos de archivo que acepta 
                 $allowedExts = array("txt", "pptx");
                 $extension = pathinfo($_FILES['file']['name'], PATHINFO_EXTENSION);
-                $filename = pathinfo($_FILES['file']['name'], PATHINFO_FILENAME);
-                $storedFilename = null;
+                $filename = !empty(pathinfo($_FILES['file']['name'], PATHINFO_FILENAME))?pathinfo($_FILES['file']['name'], PATHINFO_FILENAME):$_POST['filename'];
+                $storedFilename = $_POST['storedFilename'];
                 
                 //pregunta que tipo de archivos puedo subir y por el tamaño en bytes
                 if (($_FILES["file"]["size"] < 2000000) && in_array($extension, $allowedExts)) {
@@ -141,7 +141,7 @@
 
                 $arrayIndex[] = $_POST['name'].";" .($contentByteWriten+$lastPosition).";".$contentByteWriten.";".TRUE.";".PHP_EOL;
 
-                if (file_exists($_POST['filename'])){
+                if (isset($_POST['filename'])&&file_exists($_POST['filename'])){
                     echo $_POST['filename'] . " is going to be deleted ";
                     unlink($_POST['filename']);
                 }
@@ -211,7 +211,11 @@
                     $content = fgets($contentFile);
                     $content = explode(";", $content);
                     fclose($contentFile);
-
+                    var_dump($content[5]);
+                    echo "<pre>";
+                    print_r($content[5]);
+                    echo "</pre>";
+                    $contentFilename = !empty($content[5])?$directoryName.$content[5]:null;
                     $_SESSION['i'] = $_GET['i'];
                     $_SESSION['w'] = $_GET['w'];
                     $_SESSION['p'] = $_GET['p'];
@@ -240,12 +244,13 @@
                         </tr>
                         <tr>
                             <td>file</td>
-                            <td><a href="<?php echo $directoryName.$content[5]?>" download="<?php echo $content[6]?>"><?php echo $content[6]?></a> 
-                                <input disabled hidden name="filename" type="text" value= "<?php echo $directoryName.$content[5]?>">
-                                <input disabled hidden name="storedFilename" type="text" value= "<?php echo $directoryName.$content[5]?>">
+                            <td><a href="<?php echo $contentFilename?>" download="<?php echo $content[6]?>"><?php echo $content[6]?></a> 
+                                <input hidden name="filename" type="text" value= "<?php echo $contentFilename?>">
+                                <input hidden name="storedFilename" type="text" value= "<?php echo $content[6]?>">
                             </td>
                         </tr>
                     </table>
+                    <input type="file" name="file" id="file"></br>
                     <button type="submit" name="delete">Delete</button>
                     <button type='submit' name='update'>Update</button>
             <?php 
