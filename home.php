@@ -8,6 +8,16 @@
             session_start();
             checkCredentials();
 
+            echo "<pre>";
+            print_r($_GET);
+            echo "</pre>";
+            echo "<pre>";
+            print_r($_POST);
+            echo "</pre>";
+            echo "<pre>";
+            print_r($_FILES);
+            echo "</pre>";
+
             $username = getUserName();
             $indexFileName = indexFile($username);
             $contentFileName = contentFile($username);
@@ -20,7 +30,7 @@
                 $allowedExts = array("txt", "pptx");
                 $extension = pathinfo($_FILES['file']['name'], PATHINFO_EXTENSION);
                 $filename = pathinfo($_FILES['file']['name'], PATHINFO_FILENAME);
-                
+                $storedFilename = null;
                 //pregunta que tipo de archivos puedo subir y por el tamaño en bytes
                 if (($_FILES["file"]["size"] < 2000000) && in_array($extension, $allowedExts)) {
                     //Si ocurrio un error en la subida
@@ -68,6 +78,10 @@
             }
 
             if (isset($_POST['delete'])){
+                if (isset($_POST['filename']) && file_exists($_POST['filename'])){
+                    echo $_POST['filename'] . " is going to be deleted ";
+                    unlink($_POST['filename']);
+                }
                 
                 $posArrayIndex = explode(";", $arrayIndex[$_SESSION["p"]]);
                 $posArrayIndex[3] = 0;
@@ -78,8 +92,42 @@
 
             if (isset($_POST['update'])) {
 
+                //tipos de formatos de archivo que acepta 
+                $allowedExts = array("txt", "pptx");
+                $extension = pathinfo($_FILES['file']['name'], PATHINFO_EXTENSION);
+                $filename = pathinfo($_FILES['file']['name'], PATHINFO_FILENAME);
+                $storedFilename = null;
+                
+                //pregunta que tipo de archivos puedo subir y por el tamaño en bytes
+                if (($_FILES["file"]["size"] < 2000000) && in_array($extension, $allowedExts)) {
+                    //Si ocurrio un error en la subida
+                    if ($_FILES["file"]["error"] > 0) {
+                        echo "Return Code: " . $_FILES["file"]["error"] . "<br />";
+                    } else {
+                        //informacion del archivo
+                        echo "Upload: " . $_FILES["file"]["name"] . "<br />";
+                        echo "Type: " . $_FILES["file"]["type"] . "<br />";
+                        echo "Size: " . ($_FILES["file"]["size"] / 1024) . " Kb<br />";
+                        echo "Temp file: " . $_FILES["file"]["tmp_name"] . "<br />";
+
+                        //Para cargar en otro lugar
+                        $carga = realpath($directoryName."//");
+
+                        if (file_exists($directoryName . $_FILES["file"]["name"])) {
+                            echo $_FILES["file"]["name"] . " already exists. ";
+                        } else {
+                            $storedFilename = $filename.time().".".$extension;
+                            move_uploaded_file($_FILES["file"]["tmp_name"], $directoryName . $storedFilename);
+
+                            echo "Stored in: " . realpath($_SERVER["DOCUMENT_ROOT"]) . "\\" . $directoryName . $storedFilename;
+                        }
+                    }
+                } else {
+                    echo "Invalid file";
+                }
+
                 $contentFile = fopen($contentFileName,"a+");
-                $newContent = $_POST['name'].";".$_POST['work'].";".$_POST['mobile'].";".$_POST['email'].";".$_POST['address'].";".PHP_EOL;
+                $newContent = $_POST['name'].";".$_POST['work'].";".$_POST['mobile'].";".$_POST['email'].";".$_POST['address'].";".$storedFilename.";".$filename.";".PHP_EOL;
                 $contentByteWriten = fwrite($contentFile, $newContent);
                 fclose($contentFile);
 
@@ -93,6 +141,11 @@
 
                 $arrayIndex[] = $_POST['name'].";" .($contentByteWriten+$lastPosition).";".$contentByteWriten.";".TRUE.";".PHP_EOL;
 
+                if (file_exists($_POST['filename'])){
+                    echo $_POST['filename'] . " is going to be deleted ";
+                    unlink($_POST['filename']);
+                }
+                
                 $posArrayIndex = explode(";", $arrayIndex[$_SESSION["p"]]);
                 $posArrayIndex[3] = 0;
                 
@@ -187,7 +240,10 @@
                         </tr>
                         <tr>
                             <td>file</td>
-                            <td><a href="<?php echo $directoryName.$content[5]?>" download="<?php echo $content[6]?>"><?php echo $content[6]?></a> </td>
+                            <td><a href="<?php echo $directoryName.$content[5]?>" download="<?php echo $content[6]?>"><?php echo $content[6]?></a> 
+                                <input disabled hidden name="filename" type="text" value= "<?php echo $directoryName.$content[5]?>">
+                                <input disabled hidden name="storedFilename" type="text" value= "<?php echo $directoryName.$content[5]?>">
+                            </td>
                         </tr>
                     </table>
                     <button type="submit" name="delete">Delete</button>
