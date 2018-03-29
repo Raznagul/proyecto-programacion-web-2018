@@ -8,16 +8,6 @@
             session_start();
             checkCredentials();
 
-            echo "<pre>";
-            print_r($_GET);
-            echo "</pre>";
-            echo "<pre>";
-            print_r($_POST);
-            echo "</pre>";
-            echo "<pre>";
-            print_r($_FILES);
-            echo "</pre>";
-
             $username = getUserName();
             $indexFileName = indexFile($username);
             $contentFileName = contentFile($username);
@@ -56,7 +46,7 @@
                         }
                     }
                 } else {
-                    echo "Invalid file";
+                    //echo "Invalid file";
                 }
 
                 $contentFile = fopen($contentFileName,"a+");
@@ -79,7 +69,7 @@
 
             if (isset($_POST['delete'])){
                 if (isset($_POST['filename']) && file_exists($_POST['filename'])){
-                    echo $_POST['filename'] . " is going to be deleted ";
+                    //echo $_POST['filename'] . " is going to be deleted ";
                     unlink($_POST['filename']);
                 }
                 
@@ -90,7 +80,7 @@
                 file_put_contents($indexFileName, $arrayIndex);
             }
 
-            if (isset($_POST['update'])) {
+            if (isset($_POST['update'])||isset($_POST['deleteFile'])) {
 
                 //tipos de formatos de archivo que acepta 
                 $allowedExts = array("txt", "pptx");
@@ -98,11 +88,17 @@
                 $filename = !empty(pathinfo($_FILES['file']['name'], PATHINFO_FILENAME))?pathinfo($_FILES['file']['name'], PATHINFO_FILENAME):$_POST['filename'];
                 $storedFilename = $_POST['storedFilename'];
                 
+                if(isset($_POST['deleteFile'])){
+                    $storedFilename = null;
+                    $filename = null;
+                    $_FILES["file"] = null;
+                }
+
                 //pregunta que tipo de archivos puedo subir y por el tamaño en bytes
                 if (($_FILES["file"]["size"] < 2000000) && in_array($extension, $allowedExts)) {
                     //Si ocurrio un error en la subida
                     if ($_FILES["file"]["error"] > 0) {
-                        echo "Return Code: " . $_FILES["file"]["error"] . "<br />";
+                        //echo "Return Code: " . $_FILES["file"]["error"] . "<br />";
                     } else {
                         //informacion del archivo
                         echo "Upload: " . $_FILES["file"]["name"] . "<br />";
@@ -114,16 +110,16 @@
                         $carga = realpath($directoryName."//");
 
                         if (file_exists($directoryName . $_FILES["file"]["name"])) {
-                            echo $_FILES["file"]["name"] . " already exists. ";
+                            //echo $_FILES["file"]["name"] . " already exists. ";
                         } else {
                             $storedFilename = $filename.time().".".$extension;
                             move_uploaded_file($_FILES["file"]["tmp_name"], $directoryName . $storedFilename);
 
-                            echo "Stored in: " . realpath($_SERVER["DOCUMENT_ROOT"]) . "\\" . $directoryName . $storedFilename;
+                            //echo "Stored in: " . realpath($_SERVER["DOCUMENT_ROOT"]) . "\\" . $directoryName . $storedFilename;
                         }
                     }
                 } else {
-                    echo "Invalid file";
+                    //echo "Invalid file";
                 }
 
                 $contentFile = fopen($contentFileName,"a+");
@@ -142,7 +138,7 @@
                 $arrayIndex[] = $_POST['name'].";" .($contentByteWriten+$lastPosition).";".$contentByteWriten.";".TRUE.";".PHP_EOL;
 
                 if (isset($_POST['filename'])&&file_exists($_POST['filename'])){
-                    echo $_POST['filename'] . " is going to be deleted ";
+                    //echo $_POST['filename'] . " is going to be deleted ";
                     unlink($_POST['filename']);
                 }
                 
@@ -211,10 +207,6 @@
                     $content = fgets($contentFile);
                     $content = explode(";", $content);
                     fclose($contentFile);
-                    var_dump($content[5]);
-                    echo "<pre>";
-                    print_r($content[5]);
-                    echo "</pre>";
                     $contentFilename = !empty($content[5])?$directoryName.$content[5]:null;
                     $_SESSION['i'] = $_GET['i'];
                     $_SESSION['w'] = $_GET['w'];
@@ -244,15 +236,37 @@
                         </tr>
                         <tr>
                             <td>file</td>
-                            <td><a href="<?php echo $contentFilename?>" download="<?php echo $content[6]?>"><?php echo $content[6]?></a> 
+                            <td><?php 
+                                    if(!empty($content[6])){
+                                        echo '<a href="'.$contentFilename.'" download="'.$content[6].'">'.$content[6].'</a>';
+                                    } else {
+                                        echo "-";
+                                    }
+                                ?>
                                 <input hidden name="filename" type="text" value= "<?php echo $contentFilename?>">
                                 <input hidden name="storedFilename" type="text" value= "<?php echo $content[6]?>">
                             </td>
                         </tr>
+                        <tr>
+                            <?php 
+                                if(empty($content[6])){
+                                    echo "<td>add file</td>";
+                                } else {
+                                    echo "<td>update file</td>";
+                                }
+                            ?>
+                            <td><input type="file" name="file" id="file"></td>
+                        </tr>
                     </table>
-                    <input type="file" name="file" id="file"></br>
-                    <button type="submit" name="delete">Delete</button>
+                    <?php 
+                        if(!empty($content[6])){
+                            echo '<button type="submit" name="deleteFile">delete file</button></br>';
+                        }
+                    ?>
+                    
                     <button type='submit' name='update'>Update</button>
+                    <button type="submit" name="delete">Delete</button>
+                    
             <?php 
                 } else {
                     $_SESSION['i'] = null;
@@ -282,9 +296,14 @@
                         </tr>
                         <tr>
                             <td>file</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td>add file</td>
                             <td><input type="file" name="file" id="file"></td>
                         </tr>
                     </table>
+                    
                     <button type="submit" name="create">Create</button>
             <?php 
                 }
