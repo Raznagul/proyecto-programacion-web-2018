@@ -184,6 +184,7 @@
                         <td><a href="home.php">New</a></td>
                     </tr>
                     <?php 
+                        natcasesort($arrayIndex);
                         foreach ($arrayIndex as $key => $value) {
 
                             $value = explode(";", $value);
@@ -220,7 +221,7 @@
                             <table>
                                 <tr>
                                     <td>name</td>
-                                    <td><input name="name" type="text" value= "<?php echo $content[0]?>"></td>
+                                    <td><input name="name" type="text" value= "<?php echo $content[0]?>" required></td>
                                 </tr>
                                 <tr>
                                     <td>author</td>
@@ -284,7 +285,7 @@
                             <table>
                                 <tr>
                                     <td>name</td>
-                                    <td><input name="name" type="text" value= ""></td>
+                                    <td><input name="name" type="text" value= "" required></td>
                                 </tr>
                                 <tr>
                                     <td>author</td>
