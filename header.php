@@ -1,7 +1,10 @@
 <?php
 echo '<header>
-    <h1>'. $variables['title'] .'</h1>';
-
+    <div><h1>'. $variables['title'] .'</h1>';
+        if(isset($variables['user'])){
+            echo '<h3>User: '. $variables['user'] .'</h3>';
+        }
+    echo '</div><div>';
 if (isset($variables['login']) && $variables['login']) {
     echo '<form method="post" action="router.php">
             <input type="submit" value="login" name="login">
@@ -17,5 +20,5 @@ if (isset($variables['signup']) && $variables['signup']) {
             <input type="submit" value="signup" name="signup">
           </form>';
 }
-
-echo '</header>';
+echo '<a href="./ayuda.php">Ayuda</a>';
+echo '</div></header>';

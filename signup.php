@@ -23,15 +23,18 @@
         <?php
             includeFile('header.php', ["title" => 'Sign Up', "login" => true])
         ?>
-        <form method="post">
-        Username: <input type="text" name="userName"><br>
-        Password: <input type="password" name="pass"><br>
-        <input type="submit" value="Sign up">
-        </form>
-        <?php
-            if(!empty($error)) {
-                echo '<p>Error: '. $error .'</p>';
-            }
-        ?>
+        <div class="content-center">
+            <form method="post">
+            Username: <input type="text" name="userName"><br>
+            Password: <input type="password" name="pass"><br>
+            <input type="submit" value="Sign up">
+            </form>
+            <?php
+                if(!empty($error)) {
+                    echo '<p>Error: '. $error .'</p>';
+                }
+            ?>
+        </div>
+        
     </body>
 </html> 

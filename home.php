@@ -4,7 +4,6 @@
     <body>
         <?php
             include 'utils.php';
-            includeFile('header.php', ["title" => 'Home', "logout"=> true]);
             session_start();
             checkCredentials();
 
@@ -13,6 +12,8 @@
             $contentFileName = contentFile($username);
             $directoryName = directoryName($username);
             $arrayIndex = file($indexFileName);
+            
+            includeFile('header.php', ["title" => 'Home', "logout"=> true, "user"=> $username]);
             
             if (isset($_POST['create'])) {
 
@@ -157,168 +158,171 @@
                }
            }
         ?>
+        <div class="content">
+            <div class="left">
+                <table>
+                    <tr>
+                        <th>Files</th>
+                    </tr>
+                    <tr>
 
-        <table>
-            <tr>
-                <th>Files</th>
-            </tr>
-            <tr>
-                
-                <form method="post">                
-                    <td>Filter files:</td>
-                    <?php 
-                    if (isset($_POST['filter'])) {
-                        echo '<td><input name="filterText" type="text" value= "'. $_POST['filterText'] .'"></td>';
-                    } else {
-                        echo '<td><input name="filterText" type="text" value= ""></td>';
-                    }                    
-                    ?>
-                    <td><input name="filter" type="submit" value="Buscar"></td>
-                </form>
-            </tr>
-            <tr>
-                <td><a href="home.php">New</a></td>
-            </tr>
-            <?php 
-                foreach ($arrayIndex as $key => $value) {
-
-                    $value = explode(";", $value);
-                    if ($value[3]) {
-                        echo "<tr>";
-                        echo '<td><a target="_self" href="?contact='.$value[0].'&i='.$value[1]."&w=".$value[2]."&p=".$key.'">'.$value[0].'</a></td>';
-                        echo "</tr>";
-                    }  
-                }
-                
-            ?>
-        </table>
-
-        <hr style="border:none; height:1px;background-color:#000080">
-
-        <form action="home.php" method="post" enctype="multipart/form-data">
-            
-            <?php 
-
-                if (isset($_GET['contact'], $_GET['i'], $_GET['w'], $_GET['p'])) { 
-
-                    $contentFile = fopen($contentFileName,"c+");
-
-                    fseek($contentFile, ($_GET['i']-$_GET['w']), SEEK_CUR);
-                    $content = fgets($contentFile);
-                    $content = explode(";", $content);
-                    fclose($contentFile);
-                    $contentFilename = !empty($content[5])?$directoryName.$content[5]:null;
-                    $_SESSION['i'] = $_GET['i'];
-                    $_SESSION['w'] = $_GET['w'];
-                    $_SESSION['p'] = $_GET['p'];
-                    
-            ?>
-                    <table>
-                        <tr>
-                            <td>name</td>
-                            <td><input name="name" type="text" value= "<?php echo $content[0]?>"></td>
-                        </tr>
-                        <tr>
-                            <td>author</td>
-                            <td><input name="author" type="text" value= "<?php echo $content[1]?>"></td>
-                        </tr>
-                        <tr>
-                            <td>date</td>
-                            <td><input name="date" type="date" value= "<?php echo $content[7]?>"></td>
-                        </tr>
-                        <tr>
-                            <td>size</td>
-                            <td><input name="size" type="text" value= "<?php echo $content[2]?>"></td>
-                        </tr>
-                        <tr>
-                            <td>description</td>
-                            <td><input name="description" type="tel" value= "<?php echo $content[3]?>"></td>
-                        </tr>
-                        <tr>
-                            <td>clasification</td>
-                            <td><input name="clasification" type="text" value= "<?php echo $content[4]?>"></td>
-                        </tr>
-                        <tr>
-                            <td>file</td>
-                            <td><?php 
-                                    if(!empty($content[6])){
-                                        echo '<a href="'.$contentFilename.'" download="'.$content[6].'">'.$content[6].'</a>';
-                                    } else {
-                                        echo "-";
-                                    }
-                                ?>
-                                <input hidden name="filename" type="text" value= "<?php echo $contentFilename?>">
-                                <input hidden name="storedFilename" type="text" value= "<?php echo $content[6]?>">
-                            </td>
-                        </tr>
-                        <tr>
+                        <form method="post">                
+                            <td>Filter files:</td>
                             <?php 
-                                if(empty($content[6])){
-                                    echo "<td>add file</td>";
-                                } else {
-                                    echo "<td>update file</td>";
-                                }
+                            if (isset($_POST['filter'])) {
+                                echo '<td><input name="filterText" type="text" value= "'. $_POST['filterText'] .'"></td>';
+                            } else {
+                                echo '<td><input name="filterText" type="text" value= ""></td>';
+                            }                    
                             ?>
-                            <td><input type="file" name="file" id="file"></td>
-                        </tr>
-                    </table>
+                            <td><input name="filter" type="submit" value="Buscar"></td>
+                        </form>
+                    </tr>
+                    <tr>
+                        <td><a href="home.php">New</a></td>
+                    </tr>
                     <?php 
-                        if(!empty($content[6])){
-                            echo '<button type="submit" name="deleteFile">delete file</button></br>';
+                        foreach ($arrayIndex as $key => $value) {
+
+                            $value = explode(";", $value);
+                            if ($value[3]) {
+                                echo "<tr>";
+                                echo '<td><a target="_self" href="?contact='.$value[0].'&i='.$value[1]."&w=".$value[2]."&p=".$key.'">'.$value[0].'</a></td>';
+                                echo "</tr>";
+                            }  
                         }
                     ?>
-                    
-                    <button type='submit' name='update'>Update</button>
-                    <button type="submit" name="delete">Delete</button>
-                    
-            <?php 
-                } else {
-                    $_SESSION['i'] = null;
-                    $_SESSION['w'] = null;
-                    $_SESSION['s'] = null;
-            ?>
-                    <table>
-                        <tr>
-                            <td>name</td>
-                            <td><input name="name" type="text" value= ""></td>
-                        </tr>
-                        <tr>
-                            <td>author</td>
-                            <td><input name="author" type="text" value= ""></td>
-                        </tr>
-                        <tr>
-                            <td>date</td>
-                            <td><input name="date" type="date" value= ""></td>
-                        </tr>
-                        <tr>
-                            <td>size</td>
-                            <td><input name="size" type="text" value= ""></td>
-                        </tr>
-                        <tr>
-                            <td>description</td>
-                            <td><input name="description" type="tel" value= ""></td>
-                        </tr>
-                        <tr>
-                            <td>clasification</td>
-                            <td><input name="clasification" type="text" value= ""></td>
-                        </tr>
-                        <tr>
-                            <td>file</td>
-                            <td>-</td>
-                        </tr>
-                        <tr>
-                            <td>add file</td>
-                            <td><input type="file" name="file" id="file"></td>
-                        </tr>
-                    </table>
-                    
-                    <button type="submit" name="create">Create</button>
-            <?php 
-                }
-            
-            ?> 
-        </form>
+                </table>
+            </div>
 
+            <hr style="border: none; width: 1px; background-color: black;">
+            <div class="rigth">
+                <form action="home.php" method="post" enctype="multipart/form-data">
+                    
+                    <?php 
+
+                        if (isset($_GET['contact'], $_GET['i'], $_GET['w'], $_GET['p'])) { 
+
+                            $contentFile = fopen($contentFileName,"c+");
+
+                            fseek($contentFile, ($_GET['i']-$_GET['w']), SEEK_CUR);
+                            $content = fgets($contentFile);
+                            $content = explode(";", $content);
+                            fclose($contentFile);
+                            $contentFilename = !empty($content[5])?$directoryName.$content[5]:null;
+                            $_SESSION['i'] = $_GET['i'];
+                            $_SESSION['w'] = $_GET['w'];
+                            $_SESSION['p'] = $_GET['p'];
+
+                    ?>
+                            <table>
+                                <tr>
+                                    <td>name</td>
+                                    <td><input name="name" type="text" value= "<?php echo $content[0]?>"></td>
+                                </tr>
+                                <tr>
+                                    <td>author</td>
+                                    <td><input name="work" type="text" value= "<?php echo $content[1]?>"></td>
+                                </tr>
+                                <tr>
+                                    <td>date</td>
+                                    <td><input name="date" type="date" value= "<?php echo $content[7]?>"></td>
+                                </tr>
+                                <tr>
+                                    <td>description</td>
+                                    <td><input name="mobile" type="tel" value= "<?php echo $content[2]?>"></td>
+                                </tr>
+                                <tr>
+                                    <td>clasification</td>
+                                    <td><input name="email" type="text" value= "<?php echo $content[3]?>"></td>
+                                </tr>
+                                <tr>
+                                    <td>size</td>
+                                    <td><input name="address" type="text" value= "<?php echo $content[4]?>"></td>
+                                </tr>
+                                <tr>
+                                    <td>file</td>
+                                    <td><?php 
+                                            if(!empty($content[6])){
+                                                echo '<a href="'.$contentFilename.'" download="'.$content[6].'">'.$content[6].'</a>';
+                                            } else {
+                                                echo "-";
+                                            }
+                                        ?>
+                                        <input hidden name="filename" type="text" value= "<?php echo $contentFilename?>">
+                                        <input hidden name="storedFilename" type="text" value= "<?php echo $content[6]?>">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <?php 
+                                        if(empty($content[6])){
+                                            echo "<td>add file</td>";
+                                        } else {
+                                            echo "<td>update file</td>";
+                                        }
+                                    ?>
+                                    <td><input type="file" name="file" id="file"></td>
+                                </tr>
+                            </table>
+                            <?php 
+                                if(!empty($content[6])){
+                                    echo '<button type="submit" name="deleteFile">delete file</button></br>';
+                                }
+                            ?>
+
+                            <button type='submit' name='update'>Update</button>
+                            <button type="submit" name="delete">Delete</button>
+
+                    <?php 
+                        } else {
+                            $_SESSION['i'] = null;
+                            $_SESSION['w'] = null;
+                            $_SESSION['s'] = null;
+                    ?>
+                            <table>
+                                <tr>
+                                    <td>name</td>
+                                    <td><input name="name" type="text" value= ""></td>
+                                </tr>
+                                <tr>
+                                    <td>author</td>
+                                    <td><input name="work" type="text" value= ""></td>
+                                </tr>
+                                <tr>
+                                    <td>date</td>
+                                    <td><input name="date" type="date" value= ""></td>
+                                </tr>
+                                <tr>
+                                    <td>description</td>
+                                    <td><input name="mobile" type="tel" value= ""></td>
+                                </tr>
+                                <tr>
+                                    <td>clasification</td>
+                                    <td><input name="email" type="text" value= ""></td>
+                                </tr>
+                                <tr>
+                                    <td>size</td>
+                                    <td><input name="address" type="text" value= ""></td>
+                                </tr>
+                                <tr>
+                                    <td>file</td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td>add file</td>
+                                    <td><input type="file" name="file" id="file"></td>
+                                </tr>
+                            </table>
+
+                            <button type="submit" name="create">Create</button>
+                    <?php 
+                        }
+                    ?> 
+                </form>
+            </div>
+        
+        </div>
+        
 <?php 
 
 ?> 
