@@ -222,7 +222,7 @@
                                 </tr>
                                 <tr>
                                     <td>author</td>
-                                    <td><input name="work" type="text" value= "<?php echo $content[1]?>"></td>
+                                    <td><input name="author" type="text" value= "<?php echo $content[1]?>"></td>
                                 </tr>
                                 <tr>
                                     <td>date</td>
@@ -230,15 +230,15 @@
                                 </tr>
                                 <tr>
                                     <td>description</td>
-                                    <td><input name="mobile" type="tel" value= "<?php echo $content[2]?>"></td>
+                                    <td><input name="description" type="tel" value= "<?php echo $content[2]?>"></td>
                                 </tr>
                                 <tr>
                                     <td>clasification</td>
-                                    <td><input name="email" type="text" value= "<?php echo $content[3]?>"></td>
+                                    <td><input name="clasification" type="text" value= "<?php echo $content[3]?>"></td>
                                 </tr>
                                 <tr>
                                     <td>size</td>
-                                    <td><input name="address" type="text" value= "<?php echo $content[4]?>"></td>
+                                    <td><input name="size" type="text" value= "<?php echo $content[4]?>"></td>
                                 </tr>
                                 <tr>
                                     <td>file</td>
@@ -286,23 +286,23 @@
                                 </tr>
                                 <tr>
                                     <td>author</td>
-                                    <td><input name="work" type="text" value= ""></td>
+                                    <td><input name="author" type="text" value= ""></td>
                                 </tr>
                                 <tr>
                                     <td>date</td>
-                                    <td><input name="date" type="date" value= ""></td>
+                                    <td><input name="date" type="date" value= "="></td>
                                 </tr>
                                 <tr>
                                     <td>description</td>
-                                    <td><input name="mobile" type="tel" value= ""></td>
+                                    <td><input name="description" type="tel" value= ""></td>
                                 </tr>
                                 <tr>
                                     <td>clasification</td>
-                                    <td><input name="email" type="text" value= ""></td>
+                                    <td><input name="clasification" type="text" value= ""></td>
                                 </tr>
                                 <tr>
                                     <td>size</td>
-                                    <td><input name="address" type="text" value= ""></td>
+                                    <td><input name="size" type="text" value= ""></td>
                                 </tr>
                                 <tr>
                                     <td>file</td>
