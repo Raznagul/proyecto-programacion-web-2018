@@ -25,24 +25,24 @@
                 if (($_FILES["file"]["size"] < 2000000) && in_array($extension, $allowedExts)) {
                     //Si ocurrio un error en la subida
                     if ($_FILES["file"]["error"] > 0) {
-                        echo "Return Code: " . $_FILES["file"]["error"] . "<br />";
+                        //echo "Return Code: " . $_FILES["file"]["error"] . "<br />";
                     } else {
                         //informacion del archivo
-                        echo "Upload: " . $_FILES["file"]["name"] . "<br />";
-                        echo "Type: " . $_FILES["file"]["type"] . "<br />";
-                        echo "Size: " . ($_FILES["file"]["size"] / 1024) . " Kb<br />";
-                        echo "Temp file: " . $_FILES["file"]["tmp_name"] . "<br />";
+                        //echo "Upload: " . $_FILES["file"]["name"] . "<br />";
+                        //echo "Type: " . $_FILES["file"]["type"] . "<br />";
+                        //echo "Size: " . ($_FILES["file"]["size"] / 1024) . " Kb<br />";
+                        //echo "Temp file: " . $_FILES["file"]["tmp_name"] . "<br />";
 
                         //Para cargar en otro lugar
                         $carga = realpath($directoryName."//");
 
                         if (file_exists($directoryName . $_FILES["file"]["name"])) {
-                            echo $_FILES["file"]["name"] . " already exists. ";
+                            //echo $_FILES["file"]["name"] . " already exists. ";
                         } else {
                             $storedFilename = $filename.time().".".$extension;
                             move_uploaded_file($_FILES["file"]["tmp_name"], $directoryName . $storedFilename);
 
-                            echo "Stored in: " . realpath($_SERVER["DOCUMENT_ROOT"]) . "\\" . $directoryName . $storedFilename;
+                            //echo "Stored in: " . realpath($_SERVER["DOCUMENT_ROOT"]) . "\\" . $directoryName . $storedFilename;
                         }
                     }
                 } else {
@@ -50,7 +50,7 @@
                 }
 
                 $contentFile = fopen($contentFileName,"a+");
-                $newContent = $_POST['name'].";".$_POST['work'].";".$_POST['mobile'].";".$_POST['email'].";".$_POST['address'].";".$storedFilename.";".$filename.";".PHP_EOL;
+                $newContent = $_POST['name'].";".$_POST['author'].";".$_POST['size'].";".$_POST['description'].";".$_POST['clasification'].";".$storedFilename.";".$filename.";".$_POST["date"].";".PHP_EOL;
                 $contentByteWriten = fwrite($contentFile, $newContent);
                 fclose($contentFile);
 
@@ -101,10 +101,10 @@
                         //echo "Return Code: " . $_FILES["file"]["error"] . "<br />";
                     } else {
                         //informacion del archivo
-                        echo "Upload: " . $_FILES["file"]["name"] . "<br />";
-                        echo "Type: " . $_FILES["file"]["type"] . "<br />";
-                        echo "Size: " . ($_FILES["file"]["size"] / 1024) . " Kb<br />";
-                        echo "Temp file: " . $_FILES["file"]["tmp_name"] . "<br />";
+                        //echo "Upload: " . $_FILES["file"]["name"] . "<br />";
+                        //echo "Type: " . $_FILES["file"]["type"] . "<br />";
+                        //echo "Size: " . ($_FILES["file"]["size"] / 1024) . " Kb<br />";
+                        //echo "Temp file: " . $_FILES["file"]["tmp_name"] . "<br />";
 
                         //Para cargar en otro lugar
                         $carga = realpath($directoryName."//");
@@ -123,7 +123,7 @@
                 }
 
                 $contentFile = fopen($contentFileName,"a+");
-                $newContent = $_POST['name'].";".$_POST['work'].";".$_POST['mobile'].";".$_POST['email'].";".$_POST['address'].";".$storedFilename.";".$filename.";".PHP_EOL;
+                $newContent = $_POST['name'].";".$_POST['author'].";".$_POST['size'].";".$_POST['description'].";".$_POST['clasification'].";".$storedFilename.";".$filename.";".$_POST["date"].";".PHP_EOL;
                 $contentByteWriten = fwrite($contentFile, $newContent);
                 fclose($contentFile);
 
@@ -220,19 +220,23 @@
                         </tr>
                         <tr>
                             <td>author</td>
-                            <td><input name="work" type="text" value= "<?php echo $content[1]?>"></td>
+                            <td><input name="author" type="text" value= "<?php echo $content[1]?>"></td>
                         </tr>
                         <tr>
-                            <td>description</td>
-                            <td><input name="mobile" type="tel" value= "<?php echo $content[2]?>"></td>
-                        </tr>
-                        <tr>
-                            <td>clasification</td>
-                            <td><input name="email" type="text" value= "<?php echo $content[3]?>"></td>
+                            <td>date</td>
+                            <td><input name="date" type="date" value= "<?php echo $content[7]?>"></td>
                         </tr>
                         <tr>
                             <td>size</td>
-                            <td><input name="address" type="text" value= "<?php echo $content[4]?>"></td>
+                            <td><input name="size" type="text" value= "<?php echo $content[2]?>"></td>
+                        </tr>
+                        <tr>
+                            <td>description</td>
+                            <td><input name="description" type="tel" value= "<?php echo $content[3]?>"></td>
+                        </tr>
+                        <tr>
+                            <td>clasification</td>
+                            <td><input name="clasification" type="text" value= "<?php echo $content[4]?>"></td>
                         </tr>
                         <tr>
                             <td>file</td>
@@ -280,19 +284,23 @@
                         </tr>
                         <tr>
                             <td>author</td>
-                            <td><input name="work" type="text" value= ""></td>
+                            <td><input name="author" type="text" value= ""></td>
                         </tr>
                         <tr>
-                            <td>description</td>
-                            <td><input name="mobile" type="tel" value= ""></td>
-                        </tr>
-                        <tr>
-                            <td>clasification</td>
-                            <td><input name="email" type="text" value= ""></td>
+                            <td>date</td>
+                            <td><input name="date" type="date" value= ""></td>
                         </tr>
                         <tr>
                             <td>size</td>
-                            <td><input name="address" type="text" value= ""></td>
+                            <td><input name="size" type="text" value= ""></td>
+                        </tr>
+                        <tr>
+                            <td>description</td>
+                            <td><input name="description" type="tel" value= ""></td>
+                        </tr>
+                        <tr>
+                            <td>clasification</td>
+                            <td><input name="clasification" type="text" value= ""></td>
                         </tr>
                         <tr>
                             <td>file</td>
