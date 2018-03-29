@@ -109,13 +109,12 @@
         });
     }
 
-    /*$arr = ['orange',
-         'green string',
-         'green', 
-         'red', 
-         'black'];
-
-    $results = find_string_in_array ($arr, 'green');
-
-    if( empty($results) ) { echo 'No matches found.'; }
-    else { echo "'green' was found in: " . var_dump($results); }*/
+    function getUsers($username){
+        $path = "./";
+        $files = array_diff(scandir($path), array('.', '..', $username."_user"));
+        $files = find_string_in_array($files, 'user');
+        return array_map(function($user) {
+            return str_replace("_user", "", $user);
+        }, $files);
+    }
+    

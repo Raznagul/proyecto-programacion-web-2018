@@ -8,6 +8,8 @@
             checkCredentials();
 
             $username = getUserName();
+            $users = getUsers($username);
+            
             $indexFileName = indexFile($username);
             $contentFileName = contentFile($username);
             $directoryName = directoryName($username);
@@ -192,7 +194,7 @@
                             }  
                         }
                     ?>
-                </table>
+                </table>            
             </div>
 
             <hr style="border: none; width: 1px; background-color: black;">
@@ -312,6 +314,20 @@
                                     <td>add file</td>
                                     <td><input type="file" name="file" id="file"></td>
                                 </tr>
+                                <tr>
+                                    <td>share with</td>
+                                    <td>
+                                        <select name="share">
+                                            <option value="none">None</option>
+                                        <?php
+                                        foreach ($users as $key => $value) {
+                                            echo '<option value="$value">'.$value.'</option>';
+                                        }
+                                        ?>                    
+                                    </select>
+                                    </td>
+                                </tr>
+                                
                             </table>
 
                             <button type="submit" name="create">Create</button>
