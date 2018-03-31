@@ -11,9 +11,12 @@
             $users = getUsers($username);
             
             $indexFileName = indexFile($username);
+            $shareIndexFileName = shareIndexFile($username);
             $contentFileName = contentFile($username);
+            $shareContentFileName = shareContentFile($username);
             $directoryName = directoryName($username);
             $arrayIndex = file($indexFileName);
+            $shareIndex = file($shareIndexFileName);
             
             includeFile('header.php', ["title" => 'Home', "logout"=> true, "user"=> $username]);
             
@@ -53,9 +56,9 @@
                 }
 
                 $contentFile = fopen($contentFileName,"a+");
-                $newContent = $_POST['name'].";".$_POST['author'].";".$_POST['size'].";".$_POST['description'].";".$_POST['clasification'].";".$storedFilename.";".$filename.";".$_POST["date"].";".PHP_EOL;
+                $newContent = $_POST['name'].";".$_POST['author'].";".$_POST['size'].";".$_POST['description'].";".$_POST['clasification'].";".$storedFilename.";".$filename.";".$_POST["date"].";".$_POST["shareTo"].";".PHP_EOL;
                 $contentByteWriten = fwrite($contentFile, $newContent);
-                fclose($contentFile);
+                fclose($contentFile);                
 
                 if(!empty($arrayIndex)){
                     $lastIndex = end($arrayIndex);
@@ -67,20 +70,51 @@
 
                 $arrayIndex[] = $_POST['name'].";" .($contentByteWriten+$lastPosition).";".$contentByteWriten.";".TRUE.";".PHP_EOL;
                 file_put_contents($indexFileName, $arrayIndex);
+                
+                // share
+                if(isset($_POST['shareTo']) && !empty($_POST['shareTo']) && $_POST['shareTo'] !== 'none') {
+                    $shareContentFile = shareContentFile($_POST['shareTo']);
+                    $shareIndexFile = shareIndexFile($_POST['shareTo']);
+                    
+                    $shareFile = fopen($shareContentFile,"a+");
+                    $newContent = $_POST['name'].";".$_POST['author'].";".$_POST['size'].";".$_POST['description'].";".$_POST['clasification'].";".$storedFilename.";".$filename.";".$_POST["date"].";".PHP_EOL;
+                    $contentByteWriten = fwrite($shareFile, $newContent);
+                    fclose($shareFile);
+                    
+                    
+                    $sharetoIndex = file($shareIndexFile);
+                    if(!empty($sharetoIndex)){
+                        $lastIndex = end($sharetoIndex);
+                        $arrayLastIndex = explode(";", $lastIndex);
+                        $lastPosition = intval($arrayLastIndex[1]);
+                    } else {
+                        $lastPosition = 0;
+                    }
 
+                    $sharetoIndex[] = $_POST['name'].";" .($contentByteWriten+$lastPosition).";".$contentByteWriten.";".TRUE.";".PHP_EOL;
+                    file_put_contents($shareIndexFile, $sharetoIndex);
+                }
             }
 
             if (isset($_POST['delete'])){
-                if (isset($_POST['filename']) && file_exists($_POST['filename'])){
+                if (isset($_POST['filename']) && file_exists($_POST['filename']) && !isset($_POST['isShare'])){
                     //echo $_POST['filename'] . " is going to be deleted ";
                     unlink($_POST['filename']);
                 }
+                if(!isset($_POST['isShare'])){
+                    $posArrayIndex = explode(";", $arrayIndex[$_SESSION["p"]]);
+                    $posArrayIndex[3] = 0;
+
+                    $arrayIndex[$_SESSION["p"]] = implode(";", $posArrayIndex);
+                    file_put_contents($indexFileName, $arrayIndex);
+                } else {
+                    $posArrayIndex = explode(";", $shareIndex[$_SESSION["p"]]);
+                    $posArrayIndex[3] = 0; 
+
+                    $shareIndex[$_SESSION["p"]] = implode(";", $posArrayIndex);
+                    file_put_contents($shareIndexFileName, $shareIndex);
+                }
                 
-                $posArrayIndex = explode(";", $arrayIndex[$_SESSION["p"]]);
-                $posArrayIndex[3] = 0;
-                
-                $arrayIndex[$_SESSION["p"]] = implode(";", $posArrayIndex);
-                file_put_contents($indexFileName, $arrayIndex);
             }
 
             if (isset($_POST['update'])||isset($_POST['deleteFile'])) {
@@ -195,7 +229,22 @@
                             }  
                         }
                     ?>
-                </table>            
+                </table>
+                <table>
+                    <tr>
+                        <th>Share Files</th>
+                    </tr>
+                    <?php 
+                        foreach ($shareIndex as $key => $value) {
+                            $value = explode(";", $value);
+                            if ($value[3]) {
+                                echo "<tr>";
+                                echo '<td><a target="_self" href="?sharecontact='.$value[0].'&i='.$value[1]."&w=".$value[2]."&p=".$key.'">'.$value[0].'</a></td>';
+                                echo "</tr>";
+                            }  
+                        }
+                    ?>
+                </table>  
             </div>
 
             <hr style="border: none; width: 1px; background-color: black;">
@@ -204,44 +253,79 @@
                     
                     <?php 
 
-                        if (isset($_GET['contact'], $_GET['i'], $_GET['w'], $_GET['p'])) { 
+                        if (isset($_GET['i'], $_GET['w'], $_GET['p'])) { 
+                            
+                            $enable = isset($_GET['contact']) || false;
+                            
+                            if($enable){
+                                $contentFile = fopen($contentFileName,"c+");
 
-                            $contentFile = fopen($contentFileName,"c+");
+                                fseek($contentFile, ($_GET['i']-$_GET['w']), SEEK_CUR);
+                                $content = fgets($contentFile);
+                                $content = explode(";", $content);
+                                fclose($contentFile);
+                                $contentFilename = !empty($content[5])?$directoryName.$content[5]:null;
+                                $_SESSION['i'] = $_GET['i'];
+                                $_SESSION['w'] = $_GET['w'];
+                                $_SESSION['p'] = $_GET['p'];
+                            } else {
+                                $contentFile = fopen($shareContentFileName,"c+");
 
-                            fseek($contentFile, ($_GET['i']-$_GET['w']), SEEK_CUR);
-                            $content = fgets($contentFile);
-                            $content = explode(";", $content);
-                            fclose($contentFile);
-                            $contentFilename = !empty($content[5])?$directoryName.$content[5]:null;
-                            $_SESSION['i'] = $_GET['i'];
-                            $_SESSION['w'] = $_GET['w'];
-                            $_SESSION['p'] = $_GET['p'];
+                                fseek($contentFile, ($_GET['i']-$_GET['w']), SEEK_CUR);
+                                $content = fgets($contentFile);
+                                $content = explode(";", $content);
+                                fclose($contentFile);
+                                $contentFilename = !empty($content[5])?$directoryName.$content[5]:null;
+                                $_SESSION['i'] = $_GET['i'];
+                                $_SESSION['w'] = $_GET['w'];
+                                $_SESSION['p'] = $_GET['p'];
+                                echo '<input name="isShare" type="text" hidden value="true">';
+                                
+                            }
+                            
 
                     ?>
                             <table>
                                 <tr>
                                     <td>name</td>
-                                    <td><input name="name" type="text" value= "<?php echo $content[0]?>" required></td>
+                                    <td><input name="name" type="text" <?php echo $enable ? '' : 'disabled'?> value= "<?php echo $content[0]?>"></td>
                                 </tr>
                                 <tr>
                                     <td>author</td>
-                                    <td><input name="author" type="text" value= "<?php echo $content[1]?>"></td>
+                                    <td><input name="author" type="text" <?php echo $enable ? '' : 'disabled'?> value= "<?php echo $content[1]?>"></td>
                                 </tr>
                                 <tr>
                                     <td>date</td>
-                                    <td><input name="date" type="date" value= "<?php echo $content[7]?>"></td>
+                                    <td><input name="date" type="date" <?php echo $enable ? '' : 'disabled'?> value= "<?php echo $content[7]?>"></td>
                                 </tr>
                                 <tr>
                                     <td>description</td>
-                                    <td><input name="description" type="tel" value= "<?php echo $content[2]?>"></td>
+                                    <td><input name="description" type="tel" <?php echo $enable ? '' : 'disabled'?> value= "<?php echo $content[2]?>"></td>
                                 </tr>
                                 <tr>
                                     <td>clasification</td>
-                                    <td><input name="clasification" type="text" value= "<?php echo $content[3]?>"></td>
+                                    <td><input name="clasification" type="text" <?php echo $enable ? '' : 'disabled'?> value= "<?php echo $content[3]?>"></td>
                                 </tr>
                                 <tr>
                                     <td>size</td>
-                                    <td><input name="size" type="text" value= "<?php echo $content[4]?>"></td>
+                                    <td><input name="size" type="text" <?php echo $enable ? '' : 'disabled'?> value= "<?php echo $content[4]?>"></td>
+                                </tr>
+                                <tr>
+                                    <td>share with</td>
+                                    <td>
+                                        <select name="shareTo" <?php echo $enable ? '' : 'disabled'?>>
+                                            <option value="none">None</option>
+                                        <?php
+                                        foreach ($users as $key => $value) {                                            
+                                            if($value === $content[8]){
+                                                echo '<option selected value="' .$value .'">'.$value.'</option>';
+                                            }else{
+                                                echo '<option value="' .$value .'">'.$value.'</option>';
+                                            }                                            
+                                        }
+                                        ?>                    
+                                    </select>
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td>file</td>
@@ -252,8 +336,8 @@
                                                 echo "-";
                                             }
                                         ?>
-                                        <input hidden name="filename" type="text" value= "<?php echo $contentFilename?>">
-                                        <input hidden name="storedFilename" type="text" value= "<?php echo $content[6]?>">
+                                        <input hidden name="filename" type="text" <?php echo $enable ? '' : 'disabled'?> value= "<?php echo $contentFilename?>">
+                                        <input hidden name="storedFilename" type="text" <?php echo $enable ? '' : 'disabled'?> value= "<?php echo $content[6]?>">
                                     </td>
                                 </tr>
                                 <tr>
@@ -264,16 +348,16 @@
                                             echo "<td>update file</td>";
                                         }
                                     ?>
-                                    <td><input type="file" name="file" id="file"></td>
+                                    <td><input type="file" name="file" <?php echo $enable ? '' : 'disabled'?> id="file"></td>
                                 </tr>
                             </table>
                             <?php 
                                 if(!empty($content[6])){
-                                    echo '<button type="submit" name="deleteFile">delete file</button></br>';
+                                    echo '<button type="submit" name="deleteFile" '.  $enable ? '' : 'disabled' . '">delete file</button></br>';
                                 }
                             ?>
 
-                            <button type='submit' name='update'>Update</button>
+                            <button type='submit' name='update' <?php echo $enable ? '' : 'disabled'?> >Update</button>
                             <button type="submit" name="delete">Delete</button>
 
                     <?php 
@@ -318,11 +402,11 @@
                                 <tr>
                                     <td>share with</td>
                                     <td>
-                                        <select name="share">
+                                        <select name="shareTo">
                                             <option value="none">None</option>
                                         <?php
                                         foreach ($users as $key => $value) {
-                                            echo '<option value="$value">'.$value.'</option>';
+                                            echo '<option value="' .$value .'">'.$value.'</option>';
                                         }
                                         ?>                    
                                     </select>
