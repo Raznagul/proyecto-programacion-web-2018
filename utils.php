@@ -14,7 +14,7 @@
      
     function checkCredentials() {
         if(!isLog()){                   
-            redirect("logout.php");
+            redirect("index.php");
         }
     }
     
