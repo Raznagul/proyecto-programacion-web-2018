@@ -55,12 +55,23 @@
         return $directoryName ."content.txt";
     }
     
+    function shareIndexFile($username) {
+        $directoryName = directoryName($username);
+        return $directoryName ."share_index.txt";
+    }
+    
+    function shareContentFile($username) {
+        $directoryName = directoryName($username);
+        return $directoryName ."share_content.txt";
+    }
     
     function setUserDirectory($username, $pass) {
         $directoryName = directoryName($username);
         $passFile = passFile($username);
         $indexFile = indexFile($username);
         $contentFile = contentFile($username);
+        $shareContentFile = shareContentFile($username);
+        $shareIndexFile = shareIndexFile($username);
 
         if (!file_exists($directoryName)) {
             mkdir($directoryName, 0777, true);
@@ -73,6 +84,12 @@
             
             $contentFileHandle = fopen($contentFile, 'w') or die("can't open file");
             fclose($contentFileHandle);
+            
+            $shareIndexFileHandle = fopen($shareIndexFile, 'w') or die("can't open file");
+            fclose($shareIndexFileHandle);
+            
+            $shareContentFileHandle = fopen($shareContentFile, 'w') or die("can't open file");
+            fclose($shareContentFileHandle);
 
             $fopen = fopen($passFile, 'a');
             fwrite($fopen, $pass);
