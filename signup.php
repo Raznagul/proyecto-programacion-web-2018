@@ -1,3 +1,6 @@
+<?php
+ob_start();
+?>
 <html>
     <?php 
     include 'utils.php';  
@@ -38,3 +41,6 @@
         
     </body>
 </html> 
+<?php
+ob_end_flush();
+?>

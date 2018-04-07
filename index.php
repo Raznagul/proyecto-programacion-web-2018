@@ -1,3 +1,6 @@
+<?php
+ob_start();
+?>
 <?php 
     session_start(); 
     include 'utils.php';     
@@ -37,3 +40,6 @@
         </div>
     </body> 
 </html>
+<?php
+ob_end_flush();
+?>

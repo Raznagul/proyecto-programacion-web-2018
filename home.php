@@ -1,3 +1,6 @@
+<?php
+ob_start();
+?>
 <!DOCTYPE html>
 <html>
     <?php include_once "head.php"; ?>
@@ -347,3 +350,6 @@
         
     </body>
 </html>
+<?php
+ob_end_flush();
+?>
